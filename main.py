@@ -30,7 +30,6 @@ def gen_3x3_tuple_ls_times (times:int =9):
 
     # 将嵌套列表展平并转换为不可变的元组
     flattened = tuple (zip (list(itertools.chain.from_iterable(new_tuple_ls)), range(9)))
-    #print (flattened)
 
     if seen.intersection(flattened):
       continue
@@ -52,15 +51,29 @@ def gen_sudoku (tuple_3x3_x9):
         x = x_ -1 + v_chunks_indx*3
         table [y][x] = num
 
-  #print(nested_array[1][2])  # 输出: 6
-  #print(table)
   return table
 
-def main ():
-  print (rand_series_gen ())
-  print (gen_3x3_tuple_ls ())
-  #print (gen_3x3_tuple_ls_times (9))
-  print (gen_sudoku (gen_3x3_tuple_ls_times (9)))
+def pretty_print_sudoku (sudoku_table):
+  def group_ls (lst, group_size):
+    # 把列表按照每组的长度分组
+    # lst可能是列表或者向量, 只需允许索引访问即可
+    groups = [lst[i:i+group_size] for i in range(0, len(lst), group_size)]
+    return groups
+
+  print("-------------------")
+  for vector_group in group_ls (sudoku_table, 3):
+    for vector in vector_group:
+      groups = group_ls (vector, 3)
+      formatted_list = "|".join(" ".join(map(str, group)) for group in groups)
+
+      print("|{}|".format(formatted_list))
+    print("-------------------")
+
+def main () -> None:
+  """
+  生成并打印数独(答案)
+  """
+  pretty_print_sudoku (gen_sudoku (gen_3x3_tuple_ls_times (9)))
 
 if  __name__ == "__main__":
   main ()
