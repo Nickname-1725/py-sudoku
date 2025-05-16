@@ -23,19 +23,23 @@ def gen_3x3_tuple_ls ():
 
 def gen_3x3_tuple_ls_times (times:int =9):
   results = []
-  seen = set()  # 利用集合的哈希特性，快速检查是否重复
+  seen_ls = tuple (set() for _ in range(9)) 
+  # 1. 利用集合的哈希特性，快速检查是否重复
+  # 2. 生成9个集合
+  # 3. seen_ls元组本身不可改变，但集合可更新
 
   while len(results) < times:
     new_tuple_ls = gen_3x3_tuple_ls()
 
     # 将嵌套列表展平并转换为不可变的元组
-    flattened = tuple (zip (list(itertools.chain.from_iterable(new_tuple_ls)), range(9)))
+    flattened = tuple (itertools.chain.from_iterable(new_tuple_ls))
 
-    if seen.intersection(flattened):
+    if any(tuple_ in seen for tuple_, seen in zip(flattened, seen_ls)):
       continue
-      
+
     # 只有不重复的才能加入结果
-    seen.update(flattened)
+    for seen, tuple_in_block in zip (seen_ls, flattened):
+      seen.add (tuple_in_block)
     results.append(new_tuple_ls)
 
   return results
