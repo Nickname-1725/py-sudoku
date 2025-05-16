@@ -30,7 +30,7 @@ def gen_3x3_tuple_ls_times (times:int =9):
 
     # 将嵌套列表展平并转换为不可变的元组
     flattened = tuple (zip (list(itertools.chain.from_iterable(new_tuple_ls)), range(9)))
-    print (flattened)
+    #print (flattened)
 
     if seen.intersection(flattened):
       continue
@@ -53,12 +53,14 @@ def gen_sudoku (tuple_3x3_x9):
         table [y][x] = num
 
   #print(nested_array[1][2])  # 输出: 6
-  print(table)
+  #print(table)
+  return table
 
 def main ():
   print (rand_series_gen ())
   print (gen_3x3_tuple_ls ())
-  print (gen_3x3_tuple_ls_times (9))
+  #print (gen_3x3_tuple_ls_times (9))
+  print (gen_sudoku (gen_3x3_tuple_ls_times (9)))
 
 if  __name__ == "__main__":
   main ()
