@@ -159,23 +159,50 @@ def pretty_print_sudoku (sudoku_table : list[array.array[int]]) -> None:
   for vector_group in group_ls (sudoku_table, 3):
     for vector in vector_group:
       groups = group_ls (vector, 3)
-      formatted_list = "|".join(" ".join(map(str, group)) for group in groups)
+      formatted_list = "|".join(" ".join(map(lambda x: str (x) if x != 0 else " "
+                                             , group)) for group in groups)
 
       print("|{}|".format(formatted_list))
     print("-------------------")
+
+def generate_random_tuples (limit:int =20) -> list[tuple[int]]:
+  """
+  给定长度，随机生成一组代表数独坐标的元组
+  """
+  all_tuples = list(itertools.product(range(0, 9), repeat=2)) # 从0下标开始0~8共有9个位置
+  random.shuffle(all_tuples)
+  return all_tuples[:limit]
+
+def generate_unique_puzzle (board:list[list[int]], remove_num):
+  """
+  生成移除给定个数数字的数独谜题，解唯一
+  """
+  if remove_num > 81 - 25:
+    warnings.warn ("保留数字个数调整为25：理论下限为17，但过少时生成数独极其困难。")
+    remove_num = 81 - 25
+
+  while True:
+    remove_ls = generate_random_tuples (remove_num)
+    puzzle = copy.deepcopy(board)
+    for tuple_ in remove_ls:
+      puzzle [tuple_[0]][tuple_[1]] = 0
+    if sudoku_unique_p (puzzle):
+      return puzzle
 
 def main (output : str, retain : int) -> None:
   """
   生成并打印数独(答案)
   """
   tuple_ls_x9 = gen_3x3_tuple_ls_times (9)
+  sudoku = gen_sudoku (tuple_ls_x9)
   if output != "puzzle_only": # 是需要答案的情形
     print ("答案")
-    pretty_print_sudoku (gen_sudoku (tuple_ls_x9))
+    pretty_print_sudoku (sudoku)
+
   if output != "answer_only": # 是需要谜题的情形
-    puzzle = tuple_ls_x9 # 待实现：生成谜题，并且验证可解性
+    puzzle = generate_unique_puzzle (sudoku, 81 - retain) # 9*9 - 保留数字个数 = 去除的数字个数
     print ("谜题")
-    pretty_print_sudoku (gen_sudoku (puzzle))
+    pretty_print_sudoku (puzzle)
 
 if  __name__ == "__main__":
   # 创建解析器
