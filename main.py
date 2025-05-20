@@ -195,11 +195,11 @@ def main (output : str, retain : int) -> None:
   """
   tuple_ls_x9 = gen_3x3_tuple_ls_times (9)
   sudoku = gen_sudoku (tuple_ls_x9)
-  if output != "puzzle_only": # 是需要答案的情形
+  if output != "puzzle-only": # 是需要答案的情形
     print ("答案")
     pretty_print_sudoku (sudoku)
 
-  if output != "answer_only": # 是需要谜题的情形
+  if output != "answer-only": # 是需要谜题的情形
     puzzle = generate_unique_puzzle (sudoku, 81 - retain) # 9*9 - 保留数字个数 = 去除的数字个数
     print ("谜题")
     pretty_print_sudoku (puzzle)
