@@ -63,10 +63,10 @@ def gen_3x3_tuple_ls () -> tuple[int]:
 
   return nested_ls
 
-def gen_3x3_tuple_ls_times (times:int =9) -> list[tuple[int]] | bool:
+def gen_3x3_tuple_ls_times (times:int =9) -> list[tuple[int]]:
   """
   为每个数字生成各自九宫格内的坐标，确保相互不重叠
-  返回值类型为list(tuple(int)), 或者值为False
+  返回值类型为list(tuple(int))
   """
   results = []
   seen_ls = tuple (set() for _ in range(9)) 
@@ -75,20 +75,25 @@ def gen_3x3_tuple_ls_times (times:int =9) -> list[tuple[int]] | bool:
   # 3. seen_ls元组本身不可改变，但集合可更新
 
   while len(results) < times:
-    if not solve_sudoku (gen_sudoku (results)): # 检查是否有解
-      return False
     new_tuple_ls = gen_3x3_tuple_ls()
 
     # 将嵌套列表展平并转换为不可变的元组
     flattened = tuple (itertools.chain.from_iterable(new_tuple_ls))
 
+    # 检查是否重复，只有不重复的才能加入结果
     if any(tuple_ in seen for tuple_, seen in zip(flattened, seen_ls)):
       continue
 
-    # 只有不重复的才能加入结果
+    # 检查是否有解，只有有解才能更新结果
+    try_results = list.copy (results)
+    try_results.append (new_tuple_ls)
+    if not solve_sudoku (gen_sudoku (try_results)):
+      continue
+    
+    # 更新结果
     for seen, tuple_in_block in zip (seen_ls, flattened):
       seen.add (tuple_in_block)
-    results.append(new_tuple_ls)
+    results = try_results
 
   return results
 
@@ -129,9 +134,7 @@ def main () -> None:
   """
   生成并打印数独(答案)
   """
-  tuple_ls_x9 = None
-  while not (tuple_ls_x9 := gen_3x3_tuple_ls_times (9)):
-    print ("生成失败1次(无解)")
+  tuple_ls_x9 = gen_3x3_tuple_ls_times (9)
   pretty_print_sudoku (gen_sudoku (tuple_ls_x9))
 
 if  __name__ == "__main__":
