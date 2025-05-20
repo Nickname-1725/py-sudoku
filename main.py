@@ -2,31 +2,32 @@
 import random
 import itertools
 import array
+import copy # 引入深拷贝
+
+def is_valid(board, row, col, num):
+  """
+  检验行、列、九宫格
+  """
+  # 行检查
+  for i in range(9):
+      if board[row][i] == num:
+          return False
+  # 列检查
+  for i in range(9):
+      if board[i][col] == num:
+          return False
+  # 九宫格检查
+  start_row, start_col = 3 * (row // 3), 3 * (col // 3)
+  for i in range(start_row, start_row + 3):
+      for j in range(start_col, start_col + 3):
+          if board[i][j] == num:
+              return False
+  return True
 
 def solve_sudoku(board : list[list[int]]):
   """
   求解数独，判断是否可解（会修改board，使其变为已解状态）
   """
-  def is_valid(board, row, col, num):
-    """
-    检验行、列、九宫格
-    """
-    # 行检查
-    for i in range(9):
-        if board[row][i] == num:
-            return False
-    # 列检查
-    for i in range(9):
-        if board[i][col] == num:
-            return False
-    # 九宫格检查
-    start_row, start_col = 3 * (row // 3), 3 * (col // 3)
-    for i in range(start_row, start_row + 3):
-        for j in range(start_col, start_col + 3):
-            if board[i][j] == num:
-                return False
-    return True
-  
   # 遍历
   for row in range(9):
     for col in range(9):
@@ -40,6 +41,37 @@ def solve_sudoku(board : list[list[int]]):
           board[row][col] = 0  # 尝试失败, 回溯
         return False # 1-9 均无法完成
   return True # 没有空格，成功
+
+def solve_sudoku_guess_from_big(board : list[list[int]]):
+  """
+  求解数独，（会修改board，使其变为已解状态）
+  与solve_sudoku不同的是，它会从较大数开始猜测
+  """
+  # 遍历
+  for row in range(9):
+    for col in range(9):
+      if board[row][col] == 0: # 找到空格
+        
+        for num in reversed (range(1, 10)): # 尝试 9-1
+          if is_valid(board, row, col, num):
+            board[row][col] = num
+            if solve_sudoku(board): # 进一步求解数独
+              return True
+          board[row][col] = 0  # 尝试失败, 回溯
+        return False # 1-9 均无法完成
+  return True # 没有空格，成功
+
+def sudoku_unique_p (board : list[list[int]]) -> bool:
+  """
+  判断解的唯一性（此函数不会改变输入board的值）
+  注意：前提首先是数独可解，如果数独不可解，同样会返回False
+  """
+  board_1 = copy.deepcopy (board)
+  board_2 = copy.deepcopy (board)
+
+  solve_sudoku (board_1)
+  solve_sudoku_guess_from_big (board_2)
+  return board_1 == board_2
 
 def rand_series_gen (length:int =9) -> list[int]:
   # random.sample 一次性生成不重复随机数列表
