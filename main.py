@@ -3,6 +3,8 @@ import random
 import itertools
 import array
 import copy # 引入深拷贝
+import argparse # 引入命令行参数解析
+import warnings # 引入警告
 
 def is_valid(board, row, col, num):
   """
@@ -162,12 +164,44 @@ def pretty_print_sudoku (sudoku_table : list[array.array[int]]) -> None:
       print("|{}|".format(formatted_list))
     print("-------------------")
 
-def main () -> None:
+def main (output : str, retain : int) -> None:
   """
   生成并打印数独(答案)
   """
   tuple_ls_x9 = gen_3x3_tuple_ls_times (9)
-  pretty_print_sudoku (gen_sudoku (tuple_ls_x9))
+  if output != "puzzle_only": # 是需要答案的情形
+    print ("答案")
+    pretty_print_sudoku (gen_sudoku (tuple_ls_x9))
+  if output != "answer_only": # 是需要谜题的情形
+    puzzle = tuple_ls_x9 # 待实现：生成谜题，并且验证可解性
+    print ("谜题")
+    pretty_print_sudoku (gen_sudoku (puzzle))
 
 if  __name__ == "__main__":
-  main ()
+  # 创建解析器
+  parser = argparse.ArgumentParser(description="数独随机生成器")
+  parser.add_argument(
+    "--output",
+    type=str,
+    choices=["answer-only", "puzzle-only", "both"],
+    default="answer-only",
+    help="输出的形式，是否需要答案或谜题"
+  )
+  parser.add_argument(
+    "--retain",
+    type=int,
+    default=None,
+    help="数独中保留的数字个数，仅在输出谜题时需要"
+  )
+
+  # 解析命令行参数
+  args = parser.parse_args()
+
+  # 验证参数
+  if args.output in ["puzzle-only", "both"] and args.retain is None:
+    parser.error("当 output 为 'puzzle-only' 或 'both' 时，必须指定 --retain 参数")
+  if args.output == "answer-only" and args.retain is not None:
+    warnings.warn("当 output 为 'answer-only' 时，不需要指定 --retain 参数")
+
+  # 调用主函数
+  main(output=args.output, retain=args.retain)
