@@ -6,9 +6,9 @@ import copy # 引入深拷贝
 import argparse # 引入命令行参数解析
 import warnings # 引入警告
 
-def is_valid(board, row, col, num):
+def is_valid(board : list[list[int]], row : int, col : int, num : int) -> bool:
   """
-  检验行、列、九宫格
+  检验行、列、九宫格，是否有数字与坐标为(row,col)的数字num重复
   """
   # 行检查
   for i in range(9):
@@ -26,7 +26,7 @@ def is_valid(board, row, col, num):
               return False
   return True
 
-def solve_sudoku(board : list[list[int]]):
+def solve_sudoku(board : list[list[int]]) -> bool:
   """
   求解数独，判断是否可解（会修改board，使其变为已解状态）
   """
@@ -44,7 +44,7 @@ def solve_sudoku(board : list[list[int]]):
         return False # 1-9 均无法完成
   return True # 没有空格，成功
 
-def solve_sudoku_guess_from_big(board : list[list[int]]):
+def solve_sudoku_guess_from_big(board : list[list[int]]) -> bool:
   """
   求解数独，（会修改board，使其变为已解状态）
   与solve_sudoku不同的是，它会从较大数开始猜测
@@ -79,10 +79,10 @@ def rand_series_gen (length:int =9) -> list[int]:
   # random.sample 一次性生成不重复随机数列表
   return random.sample(range(1, length + 1), length)
 
-def gen_3x3_tuple_ls () -> tuple[int]:
+def gen_3x3_tuple_ls () -> list[list[tuple[int,int]]]:
   """
   生成一组（9个）九宫格内的坐标
-  返回值类型为tuple(int)
+  返回值类型为[[(int,int)]]
   """
   x_variants = [rand_series_gen(3) for _ in range(3)]
   y_variants = [rand_series_gen(3) for _ in range(3)]
@@ -97,7 +97,7 @@ def gen_3x3_tuple_ls () -> tuple[int]:
 
   return nested_ls
 
-def gen_3x3_tuple_ls_times (times:int =9) -> list[tuple[int]]:
+def gen_3x3_tuple_ls_times (times:int =9) -> list[tuple[int,int]]:
   """
   为每个数字生成各自九宫格内的坐标，确保相互不重叠
   返回值类型为list(tuple(int))
@@ -131,7 +131,7 @@ def gen_3x3_tuple_ls_times (times:int =9) -> list[tuple[int]]:
 
   return results
 
-def gen_sudoku (tuple_3x3_x9 : list[tuple[int]]) -> list[array.array[int]]:
+def gen_sudoku (tuple_3x3_x9 : list[tuple[int,int]]) -> list[array.array[int]]:
   """
   生成代表数独的嵌套数组(列表)
   返回类型为list(array(int))
@@ -165,7 +165,7 @@ def pretty_print_sudoku (sudoku_table : list[array.array[int]]) -> None:
       print("|{}|".format(formatted_list))
     print("-------------------")
 
-def generate_random_tuples (limit:int =20) -> list[tuple[int]]:
+def generate_random_tuples (limit:int =20) -> list[tuple[int,int]]:
   """
   给定长度，随机生成一组代表数独坐标的元组
   """
@@ -173,7 +173,7 @@ def generate_random_tuples (limit:int =20) -> list[tuple[int]]:
   random.shuffle(all_tuples)
   return all_tuples[:limit]
 
-def generate_unique_puzzle (board:list[list[int]], retain_num):
+def generate_unique_puzzle (board:list[list[int]], retain_num : int) -> list[list[int]]:
   """
   生成移除给定个数数字的数独谜题，解唯一
   限定输入retain_num范围为25~80，范围外会被强制修改
@@ -194,11 +194,11 @@ def generate_unique_puzzle (board:list[list[int]], retain_num):
     if sudoku_unique_p (puzzle):
       return puzzle
 
-def main (output : str, retain : int) -> None:
+def main (output : str, retain : int|None) -> None:
   """
   生成并打印数独(答案)
   """
-  if retain <= 0: raise ValueError ("这不可能，怎么会不超过0个(ﾟOﾟ)")
+  if retain <=0 : raise ValueError ("这不可能，怎么会不超过0个(ﾟOﾟ)")
   if retain >81 : raise ValueError ("这不可能，怎么会超过9×9个(ﾟOﾟ)")
 
   tuple_ls_x9 = gen_3x3_tuple_ls_times (9)
