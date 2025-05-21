@@ -198,8 +198,9 @@ def main (output : str, retain : int|None) -> None:
   """
   生成并打印数独(答案)
   """
-  if retain <=0 : raise ValueError ("这不可能，怎么会不超过0个(ﾟOﾟ)")
-  if retain >81 : raise ValueError ("这不可能，怎么会超过9×9个(ﾟOﾟ)")
+  if retain != None:
+    if retain <=0 : raise ValueError ("这不可能，怎么会不超过0个(ﾟOﾟ)")
+    if retain >81 : raise ValueError ("这不可能，怎么会超过9×9个(ﾟOﾟ)")
 
   tuple_ls_x9 = gen_3x3_tuple_ls_times (9)
   sudoku = gen_sudoku (tuple_ls_x9)
