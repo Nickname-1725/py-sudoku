@@ -173,16 +173,21 @@ def generate_random_tuples (limit:int =20) -> list[tuple[int]]:
   random.shuffle(all_tuples)
   return all_tuples[:limit]
 
-def generate_unique_puzzle (board:list[list[int]], remove_num):
+def generate_unique_puzzle (board:list[list[int]], retain_num):
   """
   生成移除给定个数数字的数独谜题，解唯一
+  限定输入retain_num范围为25~80，范围外会被强制修改
   """
-  if remove_num > 81 - 25:
+  if retain_num < 25:
     warnings.warn ("保留数字个数调整为25：理论下限为17，但过少时生成数独极其困难。")
-    remove_num = 81 - 25
+    retain_num = 25
+  if retain_num > 80:
+    warnings.warn ("保留数字个数调整为80：至少移除1个数字，它才算谜题吧。")
+    retain_num = 80
 
   while True:
-    remove_ls = generate_random_tuples (remove_num)
+    # 9*9 - 保留数字个数 = 去除的数字个数
+    remove_ls = generate_random_tuples (81 - retain_num)
     puzzle = copy.deepcopy(board)
     for tuple_ in remove_ls:
       puzzle [tuple_[0]][tuple_[1]] = 0
@@ -193,6 +198,9 @@ def main (output : str, retain : int) -> None:
   """
   生成并打印数独(答案)
   """
+  if retain <= 0: raise ValueError ("这不可能，怎么会不超过0个(ﾟOﾟ)")
+  if retain >81 : raise ValueError ("这不可能，怎么会超过9×9个(ﾟOﾟ)")
+
   tuple_ls_x9 = gen_3x3_tuple_ls_times (9)
   sudoku = gen_sudoku (tuple_ls_x9)
   if output != "puzzle-only": # 是需要答案的情形
@@ -200,7 +208,7 @@ def main (output : str, retain : int) -> None:
     pretty_print_sudoku (sudoku)
 
   if output != "answer-only": # 是需要谜题的情形
-    puzzle = generate_unique_puzzle (sudoku, 81 - retain) # 9*9 - 保留数字个数 = 去除的数字个数
+    puzzle = generate_unique_puzzle (sudoku, retain)
     print ("谜题")
     pretty_print_sudoku (puzzle)
 
